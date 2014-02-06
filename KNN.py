@@ -63,7 +63,8 @@ def Euclidean(ex1,ex2):
 
 def NearestNeighbor(tr,ex0,K):
 	"""
-  	This function calls the euclidean and stores the distances with datapoint in a list of lists. 
+  	This function expects a dataset and a datapoint and number of neighbors. 
+  	It calls the euclidean and stores the distances with datapoint in a list of lists. 
   	These lists are sorted according to distances and K-nearest datapoints are returned 
 	"""
 	distances = []
@@ -92,8 +93,8 @@ def eval(train,test,K):
 		for elem in ex_prime:
 			knn.append(elem[-1][-1]) #that's the class
 			result = Counter(knn)
-		result = result.most_common(1)
-		if result[0][0] == ex[-1]:
+		bestresult = result.most_common(1)
+		if bestresult[0][0] == ex[-1]:
 			correcttrain +=1
 	#test set		
 	for ex in test:
@@ -111,8 +112,8 @@ def eval(train,test,K):
 This function splits the train set in 5 (almost) equal sized splits. It returns a list of the
 5 slices containg lists of datapoints
 """
-def sfold(train,s):
-	slices = [train[i::s] for i in xrange(s)]
+def sfold(data,s):
+	slices = [data[i::s] for i in xrange(s)]
 	return slices
 
 
@@ -124,7 +125,7 @@ Then we sum up the result for every run and average over them and print the resu
 """
 def crossval(folds):
 	print '*'*45
-	print '3-fold cross validation'
+	print '%d-fold cross validation' %folds
 	print '*'*45
 	
 	slices = sfold(train_prime,folds)
@@ -132,7 +133,6 @@ def crossval(folds):
 	for k in Kcrossval:
 		print "Number of neighbors \t%d" %k
 		temp = 0
-		listoffame =[]
 		for f in xrange(folds):
 			crossvaltest = slices[f]
 			crossvaltrain =[]
@@ -156,7 +156,7 @@ Kbest = [15,17,21]
 train_prime = read_data(train)
 test_prime = read_data(test)
 
-for k in K: #here you can switch between K or Kbest
+for k in Kbest: #here you can switch between K or Kbest
 	acctrain, acctest = eval(train_prime, test_prime,k)
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
