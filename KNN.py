@@ -161,7 +161,9 @@ for k in Kbest: #here you can switch between K or Kbest
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
 	print "Accuracy train: \t%1.4f" %acctrain
+	print "Error rate train: \t%s" %str(1.0-acctrain)
 	print "Accuracy test: \t%1.4f" %acctest
+	print "Error rate test: \t%s" %str(1.0-acctest)
 print "-"*45
 
 #Calling cross-validation
