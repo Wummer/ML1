@@ -113,7 +113,9 @@ def eval(train,test,K):
 
 """
 This function splits the train set in 5 equal sized splits. It returns a list of the
-5 slices containg lists of datapoints
+5 slices containg lists of datapoints.
+
+I think this part is ok. I''ve printed them out and they look different to my eyes.
 """
 def sfold(data,s):
 	slices = [data[i::s] for i in xrange(s)]
@@ -141,14 +143,14 @@ def crossval(folds):
 			
 			for i in xrange(folds):
 				if i != f: 
-					print "this split is test: %d and this split is train %d" %(f,i) #only for debugging
+					print "this split is test: %d and this split is train %d" %(f,i) #only for debugging. It seems ok. It does not test on train slices
 					for elem in slices[i]:
 						crossvaltrain.append(elem)
 			#the following is for debuggin	
 			for elem in crossvaltest:
 				for e in crossvaltrain:
 					if str(elem) == str(e):
-						print "We are the same %s and %s" %(str(e), str(elem))
+						print "We are the same %s and %s" %(str(e), str(elem)) #The printed datapoint really are repeated datapoints in the train set
 						countsame +=1
 			
 			acctrain, acctest = eval(crossvaltrain,crossvaltest,k)
