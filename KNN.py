@@ -68,6 +68,7 @@ def NearestNeighbor(tr,ex0,K):
   	These lists are sorted according to distances and K-nearest datapoints are returned 
 	"""
 	distances = []
+
 	#distances.append(ex0)
 	for ex in tr:
 		curr_dist = Euclidean(ex,ex0) 
@@ -81,7 +82,8 @@ def NearestNeighbor(tr,ex0,K):
 This function calls KNN functions. I gets array (incl. class label) of KNN from NearestNeighbor-function. 
 Most frequent class is counted. 
 1-0 loss is calculated for train and test using counters. 
-For train the 
+For the train accuracy I train on train and use datapoints from the same set.
+For the test acc I train on train and use datapoints from test. 
 """	
 def eval(train,test,K):
 	correcttrain=0
@@ -96,6 +98,7 @@ def eval(train,test,K):
 		bestresult = result.most_common(1)
 		if bestresult[0][0] == ex[-1]:
 			correcttrain +=1
+
 	#test set		
 	for ex in test:
 		ex_prime=NearestNeighbor(train,ex,K)
@@ -109,7 +112,7 @@ def eval(train,test,K):
 	return correcttrain/len(train), correcttest/len(test)
 
 """
-This function splits the train set in 5 (almost) equal sized splits. It returns a list of the
+This function splits the train set in 5 equal sized splits. It returns a list of the
 5 slices containg lists of datapoints
 """
 def sfold(data,s):
@@ -120,29 +123,37 @@ def sfold(data,s):
 """
 After having decorated with *, this function gets a slice for testing and uses the rest for training.
 First we choose test-set - that's easy.
-Then for every test-set for as many folds as there are: use the remaining as train sets exept if it's the test set itself. 
+Then for every test-set for as many folds as there are: use the remaining as train sets exept if it's the test set. 
 Then we sum up the result for every run and average over them and print the result.  
 """
 def crossval(folds):
 	print '*'*45
 	print '%d-fold cross validation' %folds
 	print '*'*45
-	
 	slices = sfold(train_prime,folds)
-	
 	for k in Kcrossval:
 		print "Number of neighbors \t%d" %k
 		temp = 0
 		for f in xrange(folds):
+			countsame = 0
 			crossvaltest = slices[f]
 			crossvaltrain =[]
 			
 			for i in xrange(folds):
 				if i != f: 
+					print "this split is test: %d and this split is train %d" %(f,i) #only for debugging
 					for elem in slices[i]:
 						crossvaltrain.append(elem)
+			#the following is for debuggin	
+			for elem in crossvaltest:
+				for e in crossvaltrain:
+					if str(elem) == str(e):
+						print "We are the same %s and %s" %(str(e), str(elem))
+						countsame +=1
+			
 			acctrain, acctest = eval(crossvaltrain,crossvaltest,k)
 			temp += acctest
+			print "Cross eval: number of same %d" %countsame	
 		av_result = temp/folds
 		print "Averaged result \t%1.4f" %av_result
 		print "-"*45
