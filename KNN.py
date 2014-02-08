@@ -118,6 +118,7 @@ This function splits the train set in 5 equal sized splits. It returns a list of
 I think this part is ok. I''ve printed them out and they look different to my eyes.
 """
 def sfold(data,s):
+	#np.random.shuffle(data) #shuffling doesn't change the result very much
 	slices = [data[i::s] for i in xrange(s)]
 	return slices
 
