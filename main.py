@@ -17,7 +17,7 @@ def Gauss(x,m=-1,s=1):
 #plotting
 for m, s in [(-1,1),(0,2),(2,3)]:
 	plt.plot(Gauss(np.linspace(-5,5,50),m,s),label=(m,s))
-plt.legend(loc='upper right')
+#plt.legend(loc='upper right')
 plt.show()
 
 
