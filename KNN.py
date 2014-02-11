@@ -1,7 +1,6 @@
 from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
-import math
 from operator import itemgetter
 from collections import Counter
 
@@ -57,7 +56,7 @@ def Euclidean(ex1,ex2):
 	inner = 0
 	for i in range(len(ex1)-1): #We don't want the last value - that's the class
 		inner += (ex1[i] - ex2[i])**2 
-	distance = math.sqrt(inner)
+	distance = np.sqrt(inner)
 	return distance
 
 def NearestNeighbor(tr,ex0,K):
@@ -80,13 +79,13 @@ def NearestNeighbor(tr,ex0,K):
 """
 This function calls KNN functions. I gets array (incl. class label) of KNN from NearestNeighbor-function. 
 Most frequent class is counted. 
-1-0 loss is calculated for train and test using counters. 
+1-0 loss and accuracy is calculated for train and test using counters. 
 For the train accuracy I train on train and use datapoints from the same set.
 For the test acc I train on train and use datapoints from test. 
 """	
 def eval(train,test,K):
-	correcttrain=0
-	correcttest=0
+	wrongtrain=0
+	wrongtest=0
 	#train set
 	for ex in train:
 		ex_prime=NearestNeighbor(train,ex,K)
@@ -95,8 +94,8 @@ def eval(train,test,K):
 			knn.append(elem[-1][-1]) #that's the class
 			result = Counter(knn)
 		bestresult = result.most_common(1)
-		if bestresult[0][0] == ex[-1]:
-			correcttrain +=1
+		if bestresult[0][0] != ex[-1]:
+			wrongtrain +=1
 
 	#test set		
 	for ex in test:
@@ -106,9 +105,9 @@ def eval(train,test,K):
 			knn.append(elem[-1][-1]) #that's the class
 			result = Counter(knn)
 		result = result.most_common(1)
-		if result[0][0] == ex[-1]:
-			correcttest +=1
-	return correcttrain/len(train), correcttest/len(test)
+		if result[0][0] != ex[-1]:
+			wrongtest +=1
+	return wrongtrain/len(train), wrongtest/len(test)
 
 """
 This function splits the train set in 5 equal sized splits. It returns a list of the
@@ -121,7 +120,7 @@ def sfold(data,s):
 
 
 """
-After having decorated with *, this function gets a slice for testing and uses the rest for training.
+After having decorated, this function gets a slice for testing and uses the rest for training.
 First we choose test-set - that's easy.
 Then for every test-set for as many folds as there are: use the remaining as train sets exept if it's the test set. 
 Then we sum up the result for every run and average over them and print the result.  
@@ -158,8 +157,8 @@ def crossval(trainset, folds):
 			acctrain, acctest = eval(crossvaltrain,crossvaltest,k)
 			temp += acctest
 			#print "Cross eval: number of same %d" %countsame	
-		av_result = 1-temp/folds
-		print "Averaged error rate \t%1.4f" %av_result
+		av_result = temp/folds
+		print "Averaged 0-1 loss \t%1.4f" %av_result
 		print "-"*45
 
 #Computing mean and variance
@@ -201,15 +200,7 @@ The new, standardized data set is returned
 def meanfree(data):
 	for e in data:
 		number_of_features = len(e) - 1 #Leaving out the class
-	
-	mean, variance = mean_variance(data)
-	new = np.copy(data)
 
-	for num in xrange(number_of_features):
-		for i in xrange(len(data)):
-			r = (data[i][num] - mean[num]) / np.sqrt(variance[num])
-			new[i][num] = r #replacing at correct index in the copy
-	return new
 
 #Calling read and split
 train_set = read_data(train)
@@ -229,10 +220,8 @@ for k in Kcrossval: #here you can switch between different lists of K: K, Kcross
 	acctrain, acctest = eval(zeromean_train, zeromean_test,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
-	print "Accuracy train: \t%1.4f" %acctrain
-	print "Error rate train: \t%s" %str(1.0-acctrain)
-	print "Accuracy test: \t%1.4f" %acctest
-	print "Error rate test: \t%s" %str(1.0-acctest)
+	print "0-1 loss train:\t%1.4f" %acctrain
+	print "0-1-loss test:\t%1.4f" %acctest
 print "-"*45
 
 # Calling crossval
