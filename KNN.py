@@ -38,7 +38,7 @@ test = open('IrisTest2014.dt', 'r')
 
 """
 This function reads ind in the files, strips by newline and splits by space char. 
-It returns he dataset as numpy arrays with.
+It returns he dataset as numpy arrays.
 """
 def read_data(filename):
 	data_set = ([])
@@ -181,14 +181,19 @@ def mean_variance(data):
 			s +=elem[i]
 		mean = s / len(data)
 		Mean.append(mean)
-
+		"""
 		#variance:
 		for elem in data:
 			su += (elem[i] - Mean[i])**2
 			variance = su/len(data)	
 		Variance.append(variance)
+		"""
+		#variance version 2
+		for elem in data:
+			su += elem[i]**2
+		variance = (su - (Mean[i])**2/ len(data)) / len(data)
+		Variance.append(variance)
 	return Mean, Variance
-
 
 """
 This function calls mean_variance to get the mean and the variance for each feature
@@ -200,7 +205,15 @@ The new, standardized data set is returned
 def meanfree(data):
 	for e in data:
 		number_of_features = len(e) - 1 #Leaving out the class
+	
+	mean, variance = mean_variance(data)
+	new = np.copy(data)
 
+	for num in xrange(number_of_features):
+		for i in xrange(len(data)):
+			r = (data[i][num] - mean[num]) / np.sqrt(variance[num])
+			new[i][num] = r #replacing at correct index in the copy
+	return new
 
 #Calling read and split
 train_set = read_data(train)
