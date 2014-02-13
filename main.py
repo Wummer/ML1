@@ -30,14 +30,7 @@ Alternatively, we could use
 def gsample():
 	cov = np.array([[0.3,0.2],[0.2,0.2]],dtype=float)
 	mean = np.array([1,2]).T
-	"""
-	#factorisation with cholesky and numpy - wooo
-	L = np.linalg.cholesky(cov)
 
-	norm = np.random.normal(size=100*3).reshape(3,100)
-	rand = mean + np.dot(L, norm)
-	return rand
-	"""
 	#Alternatively, we can use the numpy function to get multivariate
 	return np.random.multivariate_normal(mean,cov,100).T
 
@@ -61,52 +54,58 @@ def MaxLike(x,y):
 	return MLx,MLy
 # QUANTIFICATION
 
-MLx,MLy = MaxLike(x,y)
+ML = MaxLike(x,y)
 
-x_dev = (1-MLx)/1
-y_dev = (2-MLy)/2
-
-mx,my = np.mean(x),np.mean(y)
-
-print mx,my
-print MLx,MLy
-"""Values:
-Stdx, stxy = (0.55480464532, 0.409711872631)
-MLx,MLy = (1.02586990158,1.98927066925)
-mx, my = (1.01967248849 1.98160931337)
-"""
+x_dev = (1-ML[0])/1
+y_dev = (2-ML[1])/2
 
 plt.plot(x,y,'x',label='Data')
-plt.plot(MLx,MLy,'o',label='Mean')
+plt.plot(ML[0],ML[1],'o',label='Sample Mean')
+plt.plot(1,2,'ro', label="Distribution Mean")
 plt.legend(loc="lower right")
 plt.show()
-
 
 
 """ I.2.4 Covariance: The geometry of multivariate Gaussian distributions.
 Equation 2.122
 """
 
-def MLcov(x,y,MLx,MLy):
+def MLcov(x,y,ML):
 	assert len(x) == len(y),len(MLx) == len(MLy)
-	new_x = []
-	new_y = []
-	for n in x:
-		M = n-MLx
-		nM= np.array([np.dot(M,M.T)])
 
-		new_x.append(nM)
+	samples = []
+	nM  = 0
+	MML = np.asarray([ML])
 
-	for n in y:
-		M = n-MLy
-		nM = np.array([np.dot(M,M.T)])
-		new_y.append(nM)
+	for i in range(len(x)):
+		samples.append([x[i],y[i]])
+	samples = np.asmatrix(samples)
 
-	print new_x
+	for i in range(len(x)):
+		n = samples[i]-MML
+		nM += np.dot(n.T,n)
 
-	EMLx = (1/len(x))*sum(new_x)
-	EMLy = (1/len(y))*sum(new_y)
+	EML = (1/len(x))*nM
 
-	return EMLx,EMLy
+	return EML
 
-EMLx,EMLy = MLcov(x,y,MLx,MLy)
+def transeig(ML,eigw,eigv):
+	allteigs = []
+	for i in range(len(eigw)):
+		sqeig = np.dot(eigw[i],eigv[:,i])
+		sqeig = np.sqrt(sqeig)
+		teig = ML + sqeig
+		allteigs.append(teig)
+
+	return allteigs
+
+
+def rotation(EML):
+	"do something"
+
+
+EML = MLcov(x,y,ML)
+
+eigw, eigv = np.linalg.eig(EML)
+
+teig = transeig(ML,eigw,eigv)
