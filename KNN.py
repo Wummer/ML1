@@ -230,7 +230,7 @@ Kbest2 = [1,11,15,21]
 
 #Calling KNN
 for k in Kcrossval: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
-	acctrain, acctest = eval(zeromean_train, zeromean_test,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
+	acctrain, acctest = eval(train_set, test_set,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
 	print "0-1 loss train:\t%1.4f" %acctrain
@@ -238,5 +238,5 @@ for k in Kcrossval: #here you can switch between different lists of K: K, Kcross
 print "-"*45
 
 # Calling crossval
-crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
+crossval(train_set, 5) #Switch between zeromean_train and train_set
 
