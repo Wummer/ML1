@@ -54,22 +54,26 @@ plt.show()
 We compute the mean via the equation 2.121 pp. 113 Bishop(2010).
 Then we utilize the standard deviation function as to quantify the deviation.
 """ 
-def MAXIMUMLIKELIHOODOMGWTFLOL(x,y):
+def MaxLike(x,y):
 	MLx = sum(x)*1/len(x)
 	MLy = sum(y)*1/len(y)
 
 	return MLx,MLy
+# QUANTIFICATION
 
-def std(x):
-	return np.sqrt(np.mean(abs(x - x.mean())**2))
+MLx,MLy = MaxLike(x,y)
 
-MLx,MLy = MAXIMUMLIKELIHOODOMGWTFLOL(x,y)
-stdx = std(x)
-stdy = std(y)
+x_dev = (1-MLx)/1
+y_dev = (2-MLy)/2
 
+mx,my = np.mean(x),np.mean(y)
+
+print mx,my
+print MLx,MLy
 """Values:
 Stdx, stxy = (0.55480464532, 0.409711872631)
 MLx,MLy = (1.02586990158,1.98927066925)
+mx, my = (1.01967248849 1.98160931337)
 """
 
 plt.plot(x,y,'x',label='Data')
@@ -87,16 +91,22 @@ def MLcov(x,y,MLx,MLy):
 	assert len(x) == len(y),len(MLx) == len(MLy)
 	new_x = []
 	new_y = []
-	"""
-	for xn in x:
-		new_x += (xn - MLx)(xn - MLx)
-	for yn in y:
-		new_y += (yn- MLy)(yn - MLy)
-	"""
+	for n in x:
+		M = n-MLx
+		nM= np.array([np.dot(M,M.T)])
 
-	EMLx = 1/len(x)*sum((x - MLx)(x - MLx).T)
-	EMLy = 1/len(y)*sum((y- MLy)(y - MLy).T)
+		new_x.append(nM)
 
-	return EMLx,
+	for n in y:
+		M = n-MLy
+		nM = np.array([np.dot(M,M.T)])
+		new_y.append(nM)
 
-MLcov(x,y,MLx,MLy)
+	print new_x
+
+	EMLx = (1/len(x))*sum(new_x)
+	EMLy = (1/len(y))*sum(new_y)
+
+	return EMLx,EMLy
+
+EMLx,EMLy = MLcov(x,y,MLx,MLy)

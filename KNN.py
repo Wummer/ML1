@@ -147,7 +147,7 @@ def crossval(folds):
 					print "this split is test: %d and this split is train %d" %(f,i) #only for debugging. It seems ok. It does not test on train slices
 					for elem in slices[i]:
 						crossvaltrain.append(elem)
-			#the following is for debuggin	
+			#the following is for debugging	
 			for elem in crossvaltest:
 				for e in crossvaltrain:
 					if str(elem) == str(e):
