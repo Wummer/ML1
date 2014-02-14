@@ -1,6 +1,13 @@
 from __future__ import division
+from math import *
 import numpy as np 
 import pylab as plt
+
+"""
+
+------------------------------------ I.2.x ---------------------------------------
+
+"""
 
 
 """ I.2.1	Univariate Gaussian Distribution
@@ -16,8 +23,8 @@ def Gauss(x,m=-1,s=1):
 
 #plotting
 for m, s in [(-1,1),(0,2),(2,3)]:
-	plt.plot(Gauss(np.linspace(-5,5,50),m,s),label=(m,s))
-#plt.legend(loc='upper right')
+	plt.plot(Gauss(np.linspace(-5,5,50),m,s),label=('$%d,%d$')%(m,s))
+plt.legend(loc='upper right')
 plt.show()
 
 
@@ -25,18 +32,15 @@ plt.show()
 """ I.2.2 Sampling a multivariate Gaussian distribution
 
 Here we utilize the numpy function multivariate_normal to generate 100 samples.
-Alternatively, we could use 
 """
 def gsample():
 	cov = np.array([[0.3,0.2],[0.2,0.2]],dtype=float)
-	mean = np.array([1,2]).T
+	mean = np.array([1,2])
 
-	#Alternatively, we can use the numpy function to get multivariate
 	return np.random.multivariate_normal(mean,cov,100).T
 
 
 x,y = gsample() #saving for later
-#plotting
 plt.plot(x,y,'x')
 plt.axis('equal')
 plt.show()
@@ -52,17 +56,18 @@ def MaxLike(x,y):
 	MLy = sum(y)*1/len(y)
 
 	return MLx,MLy
-# QUANTIFICATION
 
-ML = MaxLike(x,y)
+ML = np.array(MaxLike(x,y)).reshape(2,1)
 
 x_dev = (1-ML[0])/1
 y_dev = (2-ML[1])/2
 
-plt.plot(x,y,'x',label='Data')
-plt.plot(ML[0],ML[1],'o',label='Sample Mean')
-plt.plot(1,2,'ro', label="Distribution Mean")
+plt.plot(x,y,'x',label='$Data$')
+plt.plot(ML[0],ML[1],'o',label='$Sample Mean$')
+plt.plot(1,2,'ro', label="$Distribution Mean$")
 plt.legend(loc="lower right")
+plt.title('Deviation for x: %1.4f and y: %1.4f'%(x_dev,y_dev))
+plt.axis('equal')
 plt.show()
 
 
@@ -70,42 +75,96 @@ plt.show()
 Equation 2.122
 """
 
-def MLcov(x,y,ML):
-	assert len(x) == len(y),len(MLx) == len(MLy)
 
+"""
+	Here we create the sample covariance matrix as it is described by Bishop in equation 2.122.
+	To do this we utilize the previously computed sample mean.
+"""
+def MLcov(x,y,ML):
+	assert len(x) == len(y)
 	samples = []
 	nM  = 0
-	MML = np.asarray([ML])
 
 	for i in range(len(x)):
-		samples.append([x[i],y[i]])
-	samples = np.asmatrix(samples)
+		samples.append(np.array([x[i],y[i]]).reshape(2,1)) #2 columns, 1 row, i.e. vector plots
+	samples = np.array(samples)
 
 	for i in range(len(x)):
-		n = samples[i]-MML
-		nM += np.dot(n.T,n)
+		n = samples[i]-ML
+		nM += np.dot(n,n.T)
+	CML = (1/len(x))*nM
 
-	EML = (1/len(x))*nM
+	return CML,samples
 
-	return EML
 
+"""
+	Here we scale and translate the eigenvector with the equation given in assignment pdf @ I.4.2.
+"""
 def transeig(ML,eigw,eigv):
 	allteigs = []
+
 	for i in range(len(eigw)):
-		sqeig = np.dot(eigw[i],eigv[:,i])
-		sqeig = np.sqrt(sqeig)
+		sqeig = np.sqrt(eigw[i])*eigv[:,i].reshape(2,1) #Python notation is weird - we're just adding two vectors together here as in [a,b]+[c,d] = [a+b,c+d]
 		teig = ML + sqeig
 		allteigs.append(teig)
 
 	return allteigs
 
+"""
+	Here we create the rotation matrix and generate the new rotated covariance matrix rEML
+"""
 
-def rotation(EML):
-	"do something"
+def rotation(CML,theta):
+	R = np.array([[cos(theta),-sin(theta)],
+				[sin(theta),cos(theta)]])
+
+	rEML = np.linalg.inv(R)*CML*R
+
+	return R
 
 
-EML = MLcov(x,y,ML)
+""" Calling the CML function and acquiring the initial eigenvectors & transformed eigenvectors 
+CML = MLcov(x,y,ML) """
 
-eigw, eigv = np.linalg.eig(EML)
-
+CML,samples = MLcov(x,y,ML)
+eigw, eigv = np.linalg.eig(CML)
 teig = transeig(ML,eigw,eigv)
+t1 = teig[0].tolist()
+t2 = teig[1].tolist()
+
+
+"""Plotting data and scaled & translated eigenvectors """
+plt.plot(x,y,'x')
+plt.arrow(float(ML[0]),float(ML[1]),float(t1[0]-ML[0]),float(t1[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.arrow(float(ML[0]),float(ML[1]),float(t2[0]-ML[0]),float(t2[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.axis('equal')
+plt.show()
+
+
+""" Rotating the gaussian sample. We utilize the already given data points to calculate the matrix-vector product R_0z for  """
+degrees = [30,60,90]
+newplots = samples
+new_x = x
+new_y = y
+plt.plot(x,y,'x')
+
+for elem in degrees:
+	r = radians(elem)
+	rEML = rotation(CML,r)
+
+	for i in range(len(samples)):
+		newplots[i] = np.dot(rEML,samples[i])
+		new_x[i] = float(newplots[i][0])
+		new_y[i] = float(newplots[i][1])
+
+	plt.plot(new_x,new_y,'x')
+
+plt.legend(['$\\theta=0$','$\\theta=30$',"$\\theta=60$","$\\theta=90$"],loc='best')
+plt.show()
+
+
+"""
+
+------------------------------------ I.4.x ---------------------------------------
+
+"""
