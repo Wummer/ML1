@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from operator import itemgetter
 from collections import Counter
+import random
 
 
 #-----------------------------------------------------------------------
@@ -85,11 +86,12 @@ def eval(train,test,K):
 	return wrongtrain/len(train), wrongtest/len(test)
 
 """
-This function splits the train set in s equal sized splits. It returns a list of the
-5 slices containg lists of datapoints.
+This function splits the shuffled train set in s equal sized splits. The lambda constant makes sure that it's always shuffled the same way 
+It returns a list of the
+s slices containg lists of datapoints.
 """
 def sfold(data,s):
-	#np.random.shuffle(data) #shuffling doesn't change the result very much
+	random.shuffle(data, lambda: 0.8) 
 	slices = [data[i::s] for i in xrange(s)]
 	return slices
 
@@ -155,7 +157,6 @@ def mean_variance(data):
 			su += (elem[i] - Mean[i])**2
 			variance = su/len(data)	
 		Variance.append(variance)
-
 	return Mean, Variance
 
 """
@@ -168,8 +169,11 @@ The new, standardized data set is returned
 def meanfree(data):
 	for e in data:
 		number_of_features = len(e) - 1 #Leaving out the class
-	
+
 	mean, variance = mean_variance(data)
+	print "Mean", mean
+	print "Variance", variance
+
 	new = np.copy(data)
 
 	for num in xrange(number_of_features):
@@ -185,39 +189,26 @@ test_set = read_data(test)
 zeromean_train = meanfree(train_set)
 zeromean_test = meanfree(test_set)
 
+just_for_getting_mean_on_test_set = meanfree(zeromean_test)
+
 #Different K
 K = [1,3,5]
 Kcrossval = [1,3,5,7,9,11,13,15,17,21,25]
-Kbest = [15,17,21]
+Kbest = [15]
 Kbest2 = [1,11,15,21]
 
 #Calling KNN
-print "*"*45
-print "Not normalized"
-print "*"*45
+
 for k in Kcrossval: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
-	acctrain, acctest = eval(train_set,test_set,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
+	losstrain, losstest = eval(zeromean_train, zeromean_test,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
-	print "0-1 loss train:\t%1.4f" %acctrain
-	print "0-1-loss test:\t%1.4f" %acctest
+	print "0-1 loss train:\t%1.4f" %losstrain
+	print "Accuracy train:\t%1.4f" %round(1.0-losstrain,4)
+	print "0-1-loss test:\t%1.4f" %losstest
+	print "Accuracy test:\t%1.4f" %round(1.0-losstest,4)
 print "-"*45
 
 # Calling crossval
-#print "*"*45crossval(trainset, 5) #Switch between zeromean_train and train_set
-
-#Calling KNN
-print "*"*45
-print "Normalized"
-print "*"*45
-for k in Kcrossval: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
-	acctrain, acctest = eval(zeromean_train,zeromean_test ,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
-	print "-"*45
-	print "Number of neighbors: \t%d" %k
-	print "0-1 loss train:\t%1.4f" %acctrain
-	print "0-1-loss test:\t%1.4f" %acctest
-print "-"*45
-
-# Calling crossval
-crossval(train_set, 5) #Switch between zeromean_train and train_set
+crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
 
