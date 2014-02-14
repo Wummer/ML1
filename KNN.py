@@ -85,7 +85,7 @@ def eval(train,test,K):
 	return wrongtrain/len(train), wrongtest/len(test)
 
 """
-This function splits the train set in 5 equal sized splits. It returns a list of the
+This function splits the train set in s equal sized splits. It returns a list of the
 5 slices containg lists of datapoints.
 """
 def sfold(data,s):
@@ -106,6 +106,7 @@ def crossval(trainset, folds):
 	print '*'*45
 
 	slices = sfold(trainset,folds)
+	Kcrossval = [1,3,5,7,9,11,13,15,17,21,25]
 
 	for k in Kcrossval:
 		print "Number of neighbors \t%d" %k
@@ -148,18 +149,13 @@ def mean_variance(data):
 			s +=elem[i]
 		mean = s / len(data)
 		Mean.append(mean)
-		"""
+		
 		#variance:
 		for elem in data:
 			su += (elem[i] - Mean[i])**2
 			variance = su/len(data)	
 		Variance.append(variance)
-		"""
-		#variance version 2
-		for elem in data:
-			su += elem[i]**2
-		variance = (su - (Mean[i])**2/ len(data)) / len(data)
-		Variance.append(variance)
+
 	return Mean, Variance
 
 """
@@ -196,8 +192,26 @@ Kbest = [15,17,21]
 Kbest2 = [1,11,15,21]
 
 #Calling KNN
+print "*"*45
+print "Not normalized"
+print "*"*45
 for k in Kcrossval: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
-	acctrain, acctest = eval(train_set, test_set,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
+	acctrain, acctest = eval(train_set,test_set,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
+	print "-"*45
+	print "Number of neighbors: \t%d" %k
+	print "0-1 loss train:\t%1.4f" %acctrain
+	print "0-1-loss test:\t%1.4f" %acctest
+print "-"*45
+
+# Calling crossval
+#print "*"*45crossval(trainset, 5) #Switch between zeromean_train and train_set
+
+#Calling KNN
+print "*"*45
+print "Normalized"
+print "*"*45
+for k in Kcrossval: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
+	acctrain, acctest = eval(zeromean_train,zeromean_test ,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
 	print "0-1 loss train:\t%1.4f" %acctrain
