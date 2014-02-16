@@ -2,7 +2,7 @@ from __future__ import division
 from math import *
 import numpy as np 
 import pylab as plt
-
+import KNN #Our own code for the I.1.4.
 """
 
 ------------------------------------ I.2.x ---------------------------------------
@@ -168,3 +168,54 @@ plt.show()
 ------------------------------------ I.4.x ---------------------------------------
 
 """
+
+train = open('IrisTrain2014.dt', 'r')
+test = open('IrisTest2014.dt', 'r')
+
+#Calling read and split
+train_set = KNN.read_data(train)
+test_set = KNN.read_data(test)
+
+print "*" * 45
+print "Mean and variance"
+print "*" * 45
+
+print " Train set:"
+print "-" * 45
+zeromean_train = KNN.meanfree(train_set)
+
+print "Test set"
+print "-" * 45
+zeromean_test = KNN.meanfree(test_set)
+
+
+print "Normalized test set"
+just_for_getting_mean_on_test_set = KNN.meanfree(zeromean_test)
+
+#Different K
+K = [1,3,5]
+Kcrossval = [1,3,5,7,9,11,13,15,17,21,25]
+Kbest = [15]
+Kbest2 = [1,11,15,21]
+
+#Calling KNN
+print "*" * 45
+print "KNN"
+print "*" * 45
+
+for k in K: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
+	losstrain, losstest = KNN.eval(zeromean_train, zeromean_test,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
+	print "-"*45
+	print "Number of neighbors: \t%d" %k
+	print "0-1 loss train:\t%1.4f" %losstrain
+	print "Accuracy train:\t%1.4f" %round(1.0-losstrain,4)
+	print "0-1-loss test:\t%1.4f" %losstest
+	print "Accuracy test:\t%1.4f" %round(1.0-losstest,4)
+print "-"*45
+
+# Calling crossval
+print '*'*45
+print '%d-fold cross validation' %folds
+print '*'*45
+KNN.crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
+
