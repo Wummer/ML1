@@ -181,13 +181,12 @@ print "Mean and variance"
 print "*" * 45
 
 print " Train set:"
-print "-" * 45
 zeromean_train = KNN.meanfree(train_set)
+print "-" * 45
 
 print "Test set"
-print "-" * 45
 zeromean_test = KNN.meanfree(test_set)
-
+print "-" * 45
 
 print "Normalized test set"
 just_for_getting_mean_on_test_set = KNN.meanfree(zeromean_test)
@@ -196,14 +195,14 @@ just_for_getting_mean_on_test_set = KNN.meanfree(zeromean_test)
 K = [1,3,5]
 Kcrossval = [1,3,5,7,9,11,13,15,17,21,25]
 Kbest = [15]
-Kbest2 = [1,11,15,21]
+Kbest2 = [1,21]
 
 #Calling KNN
 print "*" * 45
 print "KNN"
 print "*" * 45
 
-for k in K: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
+for k in Kbest2: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
 	losstrain, losstest = KNN.eval(zeromean_train, zeromean_test,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
@@ -214,8 +213,6 @@ for k in K: #here you can switch between different lists of K: K, Kcrosscal, Kbe
 print "-"*45
 
 # Calling crossval
-print '*'*45
-print '%d-fold cross validation' %folds
-print '*'*45
+#KNN.crossval(data set, number_of folds)
 KNN.crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
 
