@@ -94,7 +94,7 @@ def MLcov(x,y,ML):
 		nM += np.dot(n,n.T)
 	CML = (1/len(x))*nM
 
-	return CML,samples
+	return CML
 
 
 """
@@ -120,13 +120,28 @@ def rotation(CML,theta):
 
 	rEML = np.linalg.inv(R)*CML*R
 
-	return R
+	return rEML
+
+"""
+	Here we solve the issue of finding the correct theta so that distribution spreads along the x-axis.
+	The intuition being that when the larger eigenvector's y coordinate is equal to the means y coordinate then the distrubtion is spreading along the x-axis.
+"""
+
+def findtheta(ML,CML):
+	for t in range(360):
+		th = np.radians(i)
+		rEML = rotation(CML,th)
+		eigw,eigv = np.linalg.eig(rEML)
+		teig = transeig(ML,eigw,eigv)
+
+
+
 
 
 """ Calling the CML function and acquiring the initial eigenvectors & transformed eigenvectors 
 CML = MLcov(x,y,ML) """
 
-CML,samples = MLcov(x,y,ML)
+CML = MLcov(x,y,ML)
 eigw, eigv = np.linalg.eig(CML)
 teig = transeig(ML,eigw,eigv)
 t1 = teig[0].tolist()
@@ -141,9 +156,9 @@ plt.axis('equal')
 plt.show()
 
 
-""" Rotating the gaussian sample. We utilize the already given data points to calculate the matrix-vector product R_0z for  """
+""" Rotating the gaussian sample. We resample the gaussian to acquire a rotated distribution.
+This gives us entirely new data points that has been rotated and share almost the same mean as the original datapoints  """
 degrees = [30,60,90]
-newplots = samples
 new_x = x
 new_y = y
 plt.plot(x,y,'x')
@@ -151,18 +166,16 @@ plt.plot(x,y,'x')
 for elem in degrees:
 	r = radians(elem)
 	rEML = rotation(CML,r)
-
-	for i in range(len(samples)):
-		newplots[i] = np.dot(rEML,samples[i])
-		new_x[i] = float(newplots[i][0])
-		new_y[i] = float(newplots[i][1])
-
-	plt.plot(new_x,new_y,'x')
+	new_x,new_y = np.random.multivariate_normal([1,2],rEML,100).T
+	plt.plot(new_x,new_y,'o')
 
 plt.legend(['$\\theta=0$','$\\theta=30$',"$\\theta=60$","$\\theta=90$"],loc='best')
+plt.axis()
 plt.show()
 
 
+""" 
+	Finding the correct theta and plotting the datapoints + the vectors"""
 """
 
 ------------------------------------ I.4.x ---------------------------------------
