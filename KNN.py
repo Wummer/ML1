@@ -9,9 +9,6 @@ import random
 #-----------------------------------------------------------------------
 #I.4
 
-train = open('IrisTrain2014.dt', 'r')
-test = open('IrisTest2014.dt', 'r')
-
 """
 This function reads ind in the files, strips by newline and splits by space char. 
 It returns he dataset as numpy arrays.
@@ -87,8 +84,7 @@ def eval(train,test,K):
 
 """
 This function splits the shuffled train set in s equal sized splits. The lambda constant makes sure that it's always shuffled the same way 
-It returns a list of the
-s slices containg lists of datapoints.
+It returns a list of s slices containg lists of datapoints.
 """
 def sfold(data,s):
 	random.shuffle(data, lambda: 0.8) 
@@ -181,34 +177,4 @@ def meanfree(data):
 			r = (data[i][num] - mean[num]) / np.sqrt(variance[num])
 			new[i][num] = r #replacing at correct index in the copy
 	return new
-
-#Calling read and split
-train_set = read_data(train)
-test_set = read_data(test)
-
-zeromean_train = meanfree(train_set)
-zeromean_test = meanfree(test_set)
-
-just_for_getting_mean_on_test_set = meanfree(zeromean_test)
-
-#Different K
-K = [1,3,5]
-Kcrossval = [1,3,5,7,9,11,13,15,17,21,25]
-Kbest = [15]
-Kbest2 = [1,11,15,21]
-
-#Calling KNN
-
-for k in Kcrossval: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
-	losstrain, losstest = eval(zeromean_train, zeromean_test,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
-	print "-"*45
-	print "Number of neighbors: \t%d" %k
-	print "0-1 loss train:\t%1.4f" %losstrain
-	print "Accuracy train:\t%1.4f" %round(1.0-losstrain,4)
-	print "0-1-loss test:\t%1.4f" %losstest
-	print "Accuracy test:\t%1.4f" %round(1.0-losstest,4)
-print "-"*45
-
-# Calling crossval
-crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
 
