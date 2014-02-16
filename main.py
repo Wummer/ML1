@@ -184,7 +184,7 @@ for elem in degrees:
 	plt.plot(new_x,new_y,'o')
 
 plt.legend(['$\\theta=0$','$\\theta=30$',"$\\theta=60$","$\\theta=90$"],loc='best')
-plt.axis()
+plt.axis('equal')
 plt.show()
 
 
@@ -199,7 +199,7 @@ plt.arrow(float(ML[0]),float(ML[1]),float(t2[0]-ML[0]),float(t2[1]-ML[1]),fc="k"
 plt.arrow(float(ML[0]),float(ML[1]),float(t3[0]),float(t3[1]),fc="r", ec="r",head_width=0.05, head_length=0.1,label="$Rotated$")
 plt.arrow(float(ML[0]),float(ML[1]),float(t4[0]),float(t4[1]),fc="r", ec="r",head_width=0.05, head_length=0.1,label="$Rotated$")
 plt.plot(x,y,'x')
-plt.title('With theta = %1.1f'%theta)
+plt.title('With $\\theta$ = %1.1f'%theta)
 plt.axis('equal')
 plt.show()
 """
