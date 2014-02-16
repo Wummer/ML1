@@ -21,6 +21,7 @@ def read_data(filename):
 	return data_set
 
 
+
 def Euclidean(ex1,ex2):
 	"""
 	This function takes two datapoints and calculates the euclidean distance between them. 
@@ -31,6 +32,8 @@ def Euclidean(ex1,ex2):
 		inner += (ex1[i] - ex2[i])**2 
 	distance = np.sqrt(inner)
 	return distance
+
+
 
 def NearestNeighbor(tr,ex0,K):
 	"""
@@ -48,6 +51,8 @@ def NearestNeighbor(tr,ex0,K):
 	distances.sort(key=itemgetter(0))
 	KNN = distances[:K] #taking only the k-best matches
 	return KNN
+
+
 
 """
 This function calls KNN functions. I gets array (incl. class label) of KNN from NearestNeighbor-function. 
@@ -82,6 +87,8 @@ def eval(train,test,K):
 			wrongtest +=1
 	return wrongtrain/len(train), wrongtest/len(test)
 
+
+
 """
 This function splits the shuffled train set in s equal sized splits. The lambda constant makes sure that it's always shuffled the same way 
 It returns a list of s slices containg lists of datapoints.
@@ -90,6 +97,7 @@ def sfold(data,s):
 	random.shuffle(data, lambda: 0.8) 
 	slices = [data[i::s] for i in xrange(s)]
 	return slices
+
 
 
 """
@@ -127,6 +135,9 @@ def crossval(trainset, folds):
 		print "Averaged 0-1 loss \t%1.4f" %av_result
 		print "-"*45
 
+
+
+
 #Computing mean and variance
 """
 This function takes a dataset and computes the mean and the variance of each input feature (leaving the class column out)
@@ -154,6 +165,9 @@ def mean_variance(data):
 			variance = su/len(data)	
 		Variance.append(variance)
 	return Mean, Variance
+
+
+
 
 """
 This function calls mean_variance to get the mean and the variance for each feature

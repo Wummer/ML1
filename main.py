@@ -3,6 +3,8 @@ from math import *
 import numpy as np 
 import pylab as plt
 import KNN #Our own code for the I.1.4.
+np.random.seed(100)
+
 """
 
 ------------------------------------ I.2.x ---------------------------------------
@@ -21,7 +23,6 @@ def Gauss(x,m=-1,s=1):
 
 	return result	
 
-#plotting
 for m, s in [(-1,1),(0,2),(2,3)]:
 	plt.plot(Gauss(np.linspace(-5,5,50),m,s),label=('$%d,%d$')%(m,s))
 plt.legend(loc='upper right')
@@ -37,7 +38,7 @@ def gsample():
 	cov = np.array([[0.3,0.2],[0.2,0.2]],dtype=float)
 	mean = np.array([1,2])
 
-	return np.random.multivariate_normal(mean,cov,100).T
+	return np.random.multivariate_normal(mean,cov,(100)).T
 
 
 x,y = gsample() #saving for later
@@ -128,14 +129,20 @@ def rotation(CML,theta):
 """
 
 def findtheta(ML,CML):
-	for t in range(360):
-		th = np.radians(i)
-		rEML = rotation(CML,th)
+	for t in range(1,361):
+		th = radians(t)
+		rEML = rotation(CML,t)
 		eigw,eigv = np.linalg.eig(rEML)
 		teig = transeig(ML,eigw,eigv)
-
-
-
+		t1 = np.ndarray.flatten(teig[0])
+		t2 =  np.ndarray.flatten(teig[1])
+		d = np.sqrt(np.sum((t1[1]-ML[1])**2))
+		print d
+		""" We perform a distance check as to get the lowest possible distance from """
+		if d < 0.001 and t != 180 and t!=360:
+			return t,t1,t2,rEML
+			break;
+		else: continue
 
 
 """ Calling the CML function and acquiring the initial eigenvectors & transformed eigenvectors 
@@ -165,7 +172,7 @@ plt.plot(x,y,'x')
 
 for elem in degrees:
 	r = radians(elem)
-	rEML = rotation(CML,r)
+	rEML = rotation(CML,elem)
 	new_x,new_y = np.random.multivariate_normal([1,2],rEML,100).T
 	plt.plot(new_x,new_y,'o')
 
@@ -175,12 +182,25 @@ plt.show()
 
 
 """ 
-	Finding the correct theta and plotting the datapoints + the vectors"""
+	Finding the correct theta and plotting the datapoints + the vectors
 """
+theta, t3,t4, rEML = findtheta(ML,CML)
+print theta
+#x,y = np.random.multivariate_normal([1,2],rEML,100).T
 
+plt.arrow(float(ML[0]),float(ML[1]),float(t1[0]-ML[0]),float(t1[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.arrow(float(ML[0]),float(ML[1]),float(t2[0]-ML[0]),float(t2[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.arrow(float(ML[0]),float(ML[1]),float(t3[0]-ML[0]),float(t3[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.arrow(float(ML[0]),float(ML[1]),float(t4[0]-ML[0]),float(t4[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.plot(x,y,'x')
+plt.axis('equal')
+plt.show()
+"""
 ------------------------------------ I.4.x ---------------------------------------
 
 """
+
+""" See the module for the explanation of each function. 
 
 train = open('IrisTrain2014.dt', 'r')
 test = open('IrisTest2014.dt', 'r')
@@ -229,3 +249,4 @@ print "-"*45
 #KNN.crossval(data set, number_of folds)
 KNN.crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
 
+"""
