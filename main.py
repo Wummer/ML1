@@ -256,9 +256,5 @@ print "-"*45
 
 # Calling crossval
 #KNN.crossval(data set, number_of folds)
-<<<<<<< HEAD
 KNN.crossval(train_set, 5) #Switch between zeromean_train and train_set
 
-=======
-KNN.crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
->>>>>>> 1d5ed83dd33cda469ed0831a5a2064fb7ebcfb2e
