@@ -158,6 +158,8 @@ CML = MLcov(x,y,ML) """
 
 CML = MLcov(x,y,ML)
 eigw, eigv = np.linalg.eig(CML)
+print eigw
+print ML
 teig = transeig(ML,eigw,eigv)
 t1 = teig[0].tolist()
 t2 = teig[1].tolist()
@@ -197,7 +199,7 @@ print theta #Returns 57.2957795131
 plt.arrow(float(ML[0]),float(ML[1]),float(t1[0]-ML[0]),float(t1[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
 plt.arrow(float(ML[0]),float(ML[1]),float(t2[0]-ML[0]),float(t2[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
 plt.arrow(float(ML[0]),float(ML[1]),float(t3[0]),float(t3[1]),fc="r", ec="r",head_width=0.05, head_length=0.1,label="$Rotated$")
-plt.arrow(float(ML[0]),float(ML[1]),float(t4[0]),float(t4[1]),fc="r", ec="r",head_width=0.05, head_length=0.1,label="$Rotated$")
+plt.arrow(float(ML[0]),float(ML[1]),float(t4[0]),float(t4[1])/2,fc="r", ec="r",head_width=0.05, head_length=0.1,label="$Rotated$")
 plt.plot(x,y,'x')
 plt.title('With $\\theta$ = %1.1f'%theta)
 plt.axis('equal')
