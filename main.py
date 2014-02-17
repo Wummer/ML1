@@ -1,8 +1,10 @@
 from __future__ import division
-from math import *
+import math
 import numpy as np 
 import pylab as plt
 import KNN #Our own code for the I.1.4.
+np.random.seed(100)
+
 """
 
 ------------------------------------ I.2.x ---------------------------------------
@@ -21,7 +23,6 @@ def Gauss(x,m=-1,s=1):
 
 	return result	
 
-#plotting
 for m, s in [(-1,1),(0,2),(2,3)]:
 	plt.plot(Gauss(np.linspace(-5,5,50),m,s),label=('$%d,%d$')%(m,s))
 plt.legend(loc='upper right')
@@ -37,7 +38,7 @@ def gsample():
 	cov = np.array([[0.3,0.2],[0.2,0.2]],dtype=float)
 	mean = np.array([1,2])
 
-	return np.random.multivariate_normal(mean,cov,100).T
+	return np.random.multivariate_normal(mean,cov,(100)).T
 
 
 x,y = gsample() #saving for later
@@ -94,7 +95,7 @@ def MLcov(x,y,ML):
 		nM += np.dot(n,n.T)
 	CML = (1/len(x))*nM
 
-	return CML,samples
+	return CML
 
 
 """
@@ -104,30 +105,61 @@ def transeig(ML,eigw,eigv):
 	allteigs = []
 
 	for i in range(len(eigw)):
-		sqeig = np.sqrt(eigw[i])*eigv[:,i].reshape(2,1) #Python notation is weird - we're just adding two vectors together here as in [a,b]+[c,d] = [a+b,c+d]
+		sqeig = np.sqrt(eigw[i])*eigv[:,i].reshape(2,1)
 		teig = ML + sqeig
 		allteigs.append(teig)
 
 	return allteigs
+
+
 
 """
 	Here we create the rotation matrix and generate the new rotated covariance matrix rEML
 """
 
 def rotation(CML,theta):
-	R = np.array([[cos(theta),-sin(theta)],
-				[sin(theta),cos(theta)]])
+	R = np.array([[math.cos(theta),-1* math.sin(theta)],
+				[math.sin(theta),math.cos(theta)]])
 
 	rEML = np.linalg.inv(R)*CML*R
 
-	return R
+	return rEML
+
+
+"""
+	Here we solve the issue of finding the correct theta so that distribution spreads along the x-axis.
+	The intuition being that when the larger eigenvector's y coordinate is equal to the means y coordinate then the distrubtion is spreading along the x-axis.
+"""
+
+def findtheta(ML,CML):
+	radians = np.linspace(1.1*math.pi,2*math.pi,200)
+	xaxis = np.array([5,float(ML[1])])
+	theta = 0
+
+	for t in xrange(1,360):
+		rEML = rotation(CML,theta)
+		eigw,eigv = np.linalg.eig(rEML)
+		bigv=math.sqrt(eigw[0])*eigv[:,0]
+		smallv=math.sqrt(eigw[1])*eigv[:,1]
+
+		""" We perform the check on the eigenvector's y value.
+		Ideally the the valuewould be 0 but due to random bias we cannot be sure of that."""
+		if bigv[1] <= 0.0000001 and theta !=math.pi:
+			print math.degrees(t)
+			return math.degrees(t),bigv,smallv,rEML
+			break;
+		else: 
+			theta+=math.pi/180
+			continue
 
 
 """ Calling the CML function and acquiring the initial eigenvectors & transformed eigenvectors 
 CML = MLcov(x,y,ML) """
 
-CML,samples = MLcov(x,y,ML)
+CML = MLcov(x,y,ML)
 eigw, eigv = np.linalg.eig(CML)
+print eigw
+print ML
 teig = transeig(ML,eigw,eigv)
 t1 = teig[0].tolist()
 t2 = teig[1].tolist()
@@ -141,33 +173,43 @@ plt.axis('equal')
 plt.show()
 
 
-""" Rotating the gaussian sample. We utilize the already given data points to calculate the matrix-vector product R_0z for  """
+""" Rotating the gaussian sample. We resample the gaussian to acquire a rotated distribution.
+This gives us entirely new data points that has been rotated and share almost the same mean as the original datapoints  """
 degrees = [30,60,90]
-newplots = samples
 new_x = x
 new_y = y
 plt.plot(x,y,'x')
 
 for elem in degrees:
-	r = radians(elem)
-	rEML = rotation(CML,r)
-
-	for i in range(len(samples)):
-		newplots[i] = np.dot(rEML,samples[i])
-		new_x[i] = float(newplots[i][0])
-		new_y[i] = float(newplots[i][1])
-
-	plt.plot(new_x,new_y,'x')
+	rEML = rotation(CML,math.radians(elem))
+	new_x,new_y = np.random.multivariate_normal([1,2],rEML,100).T
+	plt.plot(new_x,new_y,'o')
 
 plt.legend(['$\\theta=0$','$\\theta=30$',"$\\theta=60$","$\\theta=90$"],loc='best')
+plt.axis('equal')
 plt.show()
 
 
+""" 
+	Finding the correct theta and plotting the datapoints + the vectors
 """
+theta,t3,t4,rEML = findtheta(ML,CML)
+print theta #Returns 57.2957795131
 
+plt.arrow(float(ML[0]),float(ML[1]),float(t1[0]-ML[0]),float(t1[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.arrow(float(ML[0]),float(ML[1]),float(t2[0]-ML[0]),float(t2[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
+plt.arrow(float(ML[0]),float(ML[1]),float(t3[0]),float(t3[1]),fc="r", ec="r",head_width=0.05, head_length=0.1,label="$Rotated$")
+plt.arrow(float(ML[0]),float(ML[1]),float(t4[0]),float(t4[1])/2,fc="r", ec="r",head_width=0.05, head_length=0.1,label="$Rotated$")
+plt.plot(x,y,'x')
+plt.title('With $\\theta$ = %1.1f'%theta)
+plt.axis('equal')
+plt.show()
+"""
 ------------------------------------ I.4.x ---------------------------------------
 
 """
+
+""" See the module for the explanation of each function. """
 
 train = open('IrisTrain2014.dt', 'r')
 test = open('IrisTest2014.dt', 'r')
@@ -214,5 +256,9 @@ print "-"*45
 
 # Calling crossval
 #KNN.crossval(data set, number_of folds)
+<<<<<<< HEAD
 KNN.crossval(train_set, 5) #Switch between zeromean_train and train_set
 
+=======
+KNN.crossval(zeromean_train, 5) #Switch between zeromean_train and train_set
+>>>>>>> 1d5ed83dd33cda469ed0831a5a2064fb7ebcfb2e
