@@ -204,6 +204,7 @@ plt.plot(x,y,'x')
 plt.title('With $\\theta$ = %1.1f'%theta)
 plt.axis('equal')
 plt.show()
+
 """
 ------------------------------------ I.4.x ---------------------------------------
 
@@ -217,6 +218,7 @@ test = open('IrisTest2014.dt', 'r')
 #Calling read and split
 train_set = KNN.read_data(train)
 test_set = KNN.read_data(test)
+transformed_test = KNN.transformtest(train_set, test_set)
 
 print "*" * 45
 print "Mean and variance"
@@ -226,12 +228,9 @@ print " Train set:"
 zeromean_train = KNN.meanfree(train_set)
 print "-" * 45
 
-print "Test set"
-zeromean_test = KNN.meanfree(test_set)
+print "Scaled test set"
+just_for_getting_mean_on_scaled_test_set = KNN.meanfree(transformed_test)
 print "-" * 45
-
-print "Normalized test set"
-just_for_getting_mean_on_test_set = KNN.meanfree(zeromean_test)
 
 #Different K
 K = [1,3,5]
@@ -244,8 +243,8 @@ print "*" * 45
 print "KNN"
 print "*" * 45
 
-for k in Kbest2: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
-	losstrain, losstest = KNN.eval(zeromean_train, zeromean_test,k) # switch between datasets: train_set, test_set, zeromean_train, zeromean_test  
+for k in Kcrossval: #here you can switch between different lists of K: K, Kcrosscal, Kbest, Kbest2
+	losstrain, losstest = KNN.eval(zeromean_train, transformed_test,k) # switch between datasets: train_set, test_set, zeromean_train, transformed_test  
 	print "-"*45
 	print "Number of neighbors: \t%d" %k
 	print "0-1 loss train:\t%1.4f" %losstrain
@@ -255,6 +254,7 @@ for k in Kbest2: #here you can switch between different lists of K: K, Kcrosscal
 print "-"*45
 
 # Calling crossval
-#KNN.crossval(data set, number_of folds)
+#Example on how to call: KNN.crossval(dataset, number_of folds)
 KNN.crossval(train_set, 5) #Switch between zeromean_train and train_set
+
 
