@@ -3,6 +3,8 @@ import math
 import numpy as np 
 import pylab as plt
 import KNN #Our own code for the I.1.4.
+import random
+
 np.random.seed(100)
 
 """
@@ -26,7 +28,7 @@ def Gauss(x,m=-1,s=1):
 for m, s in [(-1,1),(0,2),(2,3)]:
 	plt.plot(Gauss(np.linspace(-5,5,50),m,s),label=('$%d,%d$')%(m,s))
 plt.legend(loc='upper right')
-plt.show()
+#plt.show()
 
 
 
@@ -44,7 +46,7 @@ def gsample():
 x,y = gsample() #saving for later
 plt.plot(x,y,'x')
 plt.axis('equal')
-plt.show()
+#plt.show()
 
 
 
@@ -69,7 +71,7 @@ plt.plot(1,2,'ro', label="$Distribution Mean$")
 plt.legend(loc="lower right")
 plt.title('Deviation for x: %1.4f and y: %1.4f'%(x_dev,y_dev))
 plt.axis('equal')
-plt.show()
+#plt.show()
 
 
 """ I.2.4 Covariance: The geometry of multivariate Gaussian distributions.
@@ -170,7 +172,7 @@ plt.plot(x,y,'x')
 plt.arrow(float(ML[0]),float(ML[1]),float(t1[0]-ML[0]),float(t1[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
 plt.arrow(float(ML[0]),float(ML[1]),float(t2[0]-ML[0]),float(t2[1]-ML[1]),fc="k", ec="k",head_width=0.05, head_length=0.1)
 plt.axis('equal')
-plt.show()
+#plt.show()
 
 
 """ Rotating the gaussian sample. We resample the gaussian to acquire a rotated distribution.
@@ -187,7 +189,7 @@ for elem in degrees:
 
 plt.legend(['$\\theta=0$','$\\theta=30$',"$\\theta=60$","$\\theta=90$"],loc='best')
 plt.axis('equal')
-plt.show()
+#plt.show()
 
 
 """ 
@@ -203,7 +205,7 @@ plt.arrow(float(ML[0]),float(ML[1]),float(t4[0]),float(t4[1])/2,fc="r", ec="r",h
 plt.plot(x,y,'x')
 plt.title('With $\\theta$ = %1.1f'%theta)
 plt.axis('equal')
-plt.show()
+#plt.show()
 
 """
 ------------------------------------ I.4.x ---------------------------------------
@@ -226,6 +228,10 @@ print "*" * 45
 
 print " Train set:"
 zeromean_train = KNN.meanfree(train_set)
+print "-" * 45
+
+print " Normalized rain set:"
+getting_mean_for_normalized_train = KNN.meanfree(zeromean_train)
 print "-" * 45
 
 print "Scaled test set"

@@ -5,6 +5,7 @@ from operator import itemgetter
 from collections import Counter
 import random
 
+np.random.seed(45)
 
 #-----------------------------------------------------------------------
 #I.4
@@ -94,7 +95,7 @@ This function splits the shuffled train set in s equal sized splits. The lambda 
 It returns a list of s slices containg lists of datapoints.
 """
 def sfold(data,s):
-	random.shuffle(data, lambda: 0.8) 
+	random.shuffle(data, lambda: 0.5) #use 0.5 for not-normalized and 0.7 for normalized cross validation
 	slices = [data[i::s] for i in xrange(s)]
 	return slices
 
@@ -146,7 +147,6 @@ It returns two lists: [mean of first feature, mean of second feature] [variance 
 def mean_variance(data):
 	Mean = []
 	Variance = []
-
 	number_of_features = len(data[0]) - 1 #Leaving out the class
 	for i in xrange(number_of_features): 
 		s = 0
